@@ -6,7 +6,7 @@ import { offsetsFor, PS4 } from "./ps4_offsets.js";
 const outEl = document.getElementById("out");
 const stateEl = document.getElementById("state");
 const lines = [];
-const params = new URLSearchParams(location.search);
+const params = new URLSearchParams('?log=1&afterglow=run&mode=goldhen');
 
 /* The retry notice. Two things lead here: the chain throws, or it stalls
    without a word. The watchdog covers the second case. It cannot fire when

@@ -196,8 +196,6 @@
             let autoStartEnabled = JSON.parse(localStorage.getItem('autostart') ?? autoStartEl.checked);
             let started = false;
 
-            if (!searchParams.size) location.search = '?log=1&ram=1&afterglow=run&mode=goldhen'; // apply search params if nothing
-
             // animation frame loop for auto-start countdown (a little overkill)
             (() => {
                 let autoStartTime = 0;
@@ -240,9 +238,6 @@
                 if (started) return;
                 started = true;
 
-                if (searchParams.get('ram') !== '1') document.getElementById('ramBox').style.display = 'none';
-
-                // document.body.classList.add('log');
                 await import("./jb.js");
             }
         </script>
