@@ -1,46 +1,242 @@
-<!doctype html>
-<html class="landing" lang="en" manifest="cache.appcache">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>afterglow</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <!-- Every run starts from here. The referrer guard in jb.js arms the chain
-         only when it was reached from this page, so that a browser restoring
-         its last session cannot re-run it unattended. -->
-    <div id="brand"><b>afterglow</b></div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>PS4 Kernel Exploit</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
 
-    <div class="shell">
-      <img class="meme" src="meme.png" alt="" />
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                min-height: 100vh;
+                background-color: #070707;
+                color: #fdfdfd;
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                text-align: center;
+            }
 
-      <main class="panel">
-        <p class="lede">PS4 kernel exploit &middot; firmware 13.52 and 14.00</p>
+            .header {
+                position: absolute;
+                top: 0;
+                margin: 20px;
+            }
 
-        <form class="pick" id="pick">
-          <label class="opt">
-            <input type="radio" name="payload" value="hen" />
-            <span>ps4-hen</span>
-          </label>
-          <label class="opt">
-            <input type="radio" name="payload" value="goldhen" checked />
-            <span>GoldHEN</span>
-          </label>
+            .controls {
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+                width: 320px;
+                padding: 28px;
+                background: #0e0e0e;
+                border: 1px solid #252525;
+                border-radius: 16px;
+                box-sizing: border-box;
+            }
 
-          <label class="opt opt-auto">
-            <input type="checkbox" id="auto" checked />
-            <span>autostart</span>
-          </label>
+            .autostart {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 14px;
+                color: #d7d7d7;
+                font-size: 18px;
+                background-color: #1b1b1b;
+                border: 1px solid #2a2a2a;
+                border-radius: 10px;
+            }
 
-          <button class="btn" type="submit">start</button>
-          <p class="count" id="count"></p>
-          <p class="count" id="cache" aria-live="polite"></p>
-        </form>
-      </main>
-    </div>
+            .autostart > input[type=checkbox] {
+                width: 20px;
+                height: 20px;
+                accent-color: #44ff98;
+            }
 
-    <p class="byline">by well0nez/m0zz</p>
-    <script src="launch.js"></script>
-  </body>
+            #start {
+                background-color: #44ff98;
+                color: #004d00;
+                border-radius: 10px;
+                border-style: none;
+                font-size: 20px;
+                font-weight: bold;
+                cursor: pointer;
+                padding: 13px;
+                transition: background-color 0.2s;
+            }
+
+            #start:hover {
+                background-color: #2edd7d;
+            }
+
+            #countdown {
+                /* min-height: 1.2em; */
+                color: #a1a1a1;
+                font-size: 14px;
+            }
+
+            .footer {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                color: #666666;
+                padding: 12px;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            .log > .controls, :not(.log) > .exploit {
+                display: none;
+            }
+
+            .exploit {
+                display: flex;
+                flex-direction: column;
+                /* justify-content: center; */
+                align-items: center;
+                position: absolute;
+                top: 70px;
+                bottom: 50px;
+                left: 40px;
+                right: 40px;
+                width: auto;
+                height: auto;
+                gap: 10px;
+            }
+
+            #msg {
+                position: absolute;
+                display: flex;
+                align-items: center;
+                /* justify-content: center; */
+                /* width: 100%; */
+                height: 100%;
+                font-size: 28px;
+            }
+
+            #state {
+                margin-top: 20px;
+                width: 100%;
+                font-size: 32px;
+                font-weight: bold;
+                text-align: left;
+            }
+
+            #out {
+                background-color: #0f0f0f;
+                border: 1px solid #222222;
+                border-radius: 7px;
+                width: 100%;
+                flex: 1;
+                padding: 20px;
+                text-align: left;
+                white-space: pre-line;
+            }
+
+            #out > .notice {
+                font-size: 32px;                
+                margin-top: 10px;
+            }
+
+            a {
+                text-decoration: none;
+                color: #a3a3a3;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="header">PS4 Kernel Exploit</h1>
+
+        <div class="controls">
+            <div class="autostart">
+                <span>Auto-start:</span>
+                <input type="checkbox" id="autostart" checked />
+            </div>
+            <button id="start">Exploit</button>
+            <span style="display: none" id="countdown"></span>
+        </div>
+
+        <div class="exploit">
+            <div id="ramBox"></div>
+            <div id="msg"></div>
+            <div id="state"></div>
+            <div id="out"></div>
+        </div>
+
+        <div class="footer">
+            <span>WebKit Kernel Exploit for PS4 firmware 13.52-14.00 using the GoldHEN payload</span>
+            <!-- <a href="https://github.com/Lyall-A/PS4-WebKit">GitHub</a> -->
+        </div>
+
+        <script type="module">
+            // elements
+            const startEl = document.getElementById('start');
+            const autoStartEl = document.getElementById('autostart');
+            const countDownEl = document.getElementById('countdown');
+            const exploitEl = document.querySelector('.exploit');
+
+            // constants
+            const autoStartTimeout = 5_000;
+            
+            // variables
+            let autoStartEnabled = JSON.parse(localStorage.getItem('autostart') ?? autoStartEl.checked);
+            let started = false;
+
+            if (!location.search) location.search = '?log=1&ram=1&afterglow=run'; // apply search params if nothing
+
+            // animation frame loop for auto-start countdown (a little overkill)
+            (() => {
+                let autoStartTime = 0;
+                let autoStarted = false;
+                let lastFrame;
+
+                (function animationFrameLoop(timestamp) {
+                    requestAnimationFrame(animationFrameLoop);
+
+                    const frameTime = lastFrame ? timestamp - lastFrame : 0;
+                    lastFrame = timestamp;
+
+                    if (autoStartEnabled && !started) {
+                        if (autoStartTime >= autoStartTimeout) start();
+
+                        countDownEl.style.display = '';
+                        countDownEl.textContent = `Exploiting in ${Math.ceil((autoStartTimeout - autoStartTime) / 1000)} second(s)`;
+                        autoStartTime += frameTime;
+                    } else {
+                        if (autoStartTime) {
+                            autoStartTime = 0;
+                            countDownEl.style.display = 'none';
+                            countDownEl.textContent = '';
+                        }
+                    }
+                })();
+            })();
+
+            // auto-start checkbox
+            autoStartEl.checked = autoStartEnabled;
+            autoStartEl.addEventListener('click', () => {
+                autoStartEnabled = autoStartEl.checked;
+                localStorage.setItem('autostart', JSON.stringify(autoStartEnabled));
+            });
+
+            // start button
+            startEl.addEventListener('click', start);
+
+            async function start() {
+                if (started) return;
+                started = true;
+
+                await import("./jb.js");
+            }
+        </script>
+    </body>
 </html>
