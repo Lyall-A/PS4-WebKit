@@ -143,6 +143,7 @@
                 font-size: 14px;
                 text-align: left;
                 white-space: pre-wrap;
+                overflow: auto;
             }
 
             #out > .notice {
@@ -241,6 +242,7 @@
 
                 if (searchParams.get('ram') !== '1') document.getElementById('ramBox').style.display = 'none';
 
+                // document.body.classList.add('log');
                 await import("./jb.js");
             }
         </script>
