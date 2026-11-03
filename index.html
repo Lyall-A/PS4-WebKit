@@ -186,12 +186,13 @@
 
             // constants
             const autoStartTimeout = 5_000;
+            const searchParams = new URLSearchParams(location.search);
             
             // variables
             let autoStartEnabled = JSON.parse(localStorage.getItem('autostart') ?? autoStartEl.checked);
             let started = false;
 
-            if (!location.search) location.search = '?log=1&ram=1&afterglow=run'; // apply search params if nothing
+            if (!searchParams.size) location.search = '?log=1&ram=1&afterglow=run'; // apply search params if nothing
 
             // animation frame loop for auto-start countdown (a little overkill)
             (() => {
@@ -234,6 +235,8 @@
             async function start() {
                 if (started) return;
                 started = true;
+
+                if (searchParams.get('ram') !== '1') document.getElementById('ramBox').style.display = 'none';
 
                 await import("./jb.js");
             }
