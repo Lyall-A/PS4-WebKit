@@ -195,7 +195,7 @@
             let autoStartEnabled = JSON.parse(localStorage.getItem('autostart') ?? autoStartEl.checked);
             let started = false;
 
-            if (!searchParams.size) location.search = '?log=1&ram=1&afterglow=run'; // apply search params if nothing
+            if (!searchParams.size) location.search = '?log=1&ram=1&afterglow=run&mode=goldhen'; // apply search params if nothing
 
             // animation frame loop for auto-start countdown (a little overkill)
             (() => {
